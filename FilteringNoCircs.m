@@ -27,7 +27,7 @@ threshold_comb = 5.43; #5.53, 5.17
 % Flag: Artificially add imaginary noise
 imnoise = 0;   
 % Flag: no signal desired  
-onlynoise = 1;     
+onlynoise = 0;     
 % negative lower limit in log plots
 disp_lowlim = 100;
 % negative upper limit in log plots
@@ -65,7 +65,7 @@ writepath = './output/';
 % Loop over files
 % for ii=1:numel(allwavsCell) 
 % or consider only one file
-ii=2; 
+ii=1; 
 
 % Select file and load
 wavfile = allwavsCell{ii};
