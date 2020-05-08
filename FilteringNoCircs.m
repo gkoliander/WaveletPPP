@@ -1,4 +1,5 @@
 % Load required packages
+%ltfat version 2.4.0+ required
 pkg load ltfat;
 pkg load image;
 pkg load geometry;
@@ -26,7 +27,7 @@ threshold_comb = 5.43; #5.53, 5.17
 % Flag: Artificially add imaginary noise
 imnoise = 0;   
 % Flag: no signal desired  
-onlynoise = 0;     
+onlynoise = 1;     
 % negative lower limit in log plots
 disp_lowlim = 100;
 % negative upper limit in log plots
@@ -64,7 +65,7 @@ writepath = './output/';
 % Loop over files
 % for ii=1:numel(allwavsCell) 
 % or consider only one file
-ii=3; 
+ii=2; 
 
 % Select file and load
 wavfile = allwavsCell{ii};
@@ -189,74 +190,74 @@ for ky = 1:nrofyshifts
   min_y_loc = max_y*maxryfac^(ky);
   max_y_close = max_y*maxryfac^(max(0,ky-2));
   min_y_close = max_y*maxryfac^(ky+1);
-x_shift = maxrx*max_y_close;
-nrofshifts = ceil(L/fs/x_shift);
+  x_shift = maxrx*max_y_close;
+  nrofshifts = ceil(L/fs/x_shift);
 %consider iteratively x-ranges of width 3*x_shift shifted by x_shift
 
-for kx = 1:nrofshifts
-  max_x_loc = (kx)*x_shift;
-  min_x_loc = (kx-1)*x_shift;
-  max_x_close = (kx+1)*x_shift;
-  min_x_close = (kx-2)*x_shift;
-  indinvestigated = find((locminx>=min_x_loc)&(locminx<max_x_loc)&...
-                    (locminy>min_y_loc)&(locminy<=max_y_loc));
-  indcloseext = find((locminx>=min_x_close)&(locminx<max_x_close)&...
-                    (locminy>min_y_close)&(locminy<=max_y_close));
-  total_processed = total_processed + length(indinvestigated);
-  %calculate pseudo-hyperbolic distance between zeros in vicinity
-  tempdists = zeros(length(indinvestigated),length(indcloseext));
-  tempdists = ((locminx(indcloseext)'-locminx(indinvestigated)).^2 + ...
-      (locminy(indcloseext)'-locminy(indinvestigated)).^2)...
-      ./(locminy(indinvestigated)*locminy(indcloseext)');
-  %pseudo-hyperbolic circle of radius r_base around (x_1, y_1) is the same as 
-  % Euclidean circle of radius r_euclid around (x_euclid1,y_euclid1)
-  x_euclid1 = zeros(length(indinvestigated),1);
-  x_euclid1 = locminx(indinvestigated);
-  y_euclid1 = zeros(length(indinvestigated),nrr1);
-  y_euclid1 = locminy(indinvestigated)*((1+r_1.^2)./(1-r_1.^2));
-  r_euclid = zeros(length(indinvestigated),nrr1);
-  r_euclid = 2*locminy(indinvestigated)*(r_1./(1-r_1.^2));
-  %Calculate which indices are within the circle 
-  % of radius r_euclid around (x_euclid1,y_euclid1)
-  yfrom = zeros(length(indinvestigated),nrr1);
-  yto = zeros(length(indinvestigated),nrr1);
-  yfrom = lookup(ygrid',y_euclid1+r_euclid)+1;
-  yto = lookup(ygrid',y_euclid1-r_euclid);
-  xfrom = zeros(length(indinvestigated),filtNos,nrr1);
-  xto = zeros(length(indinvestigated),filtNos,nrr1);
-  for rind=1:nrr1
-    xfrom(:,:,rind) = max(ceil(fs/as*(x_euclid1-...
-          sqrt(max(r_euclid(:,rind).^2-(ygrid'-y_euclid1(:,rind)).^2,0)))),1);
-    xto(:,:,rind) = min(floor(fs/as*(x_euclid1+...
-          sqrt(max(r_euclid(:,rind).^2-(ygrid'-y_euclid1(:,rind)).^2,0)))),N);
-  end;
-
-  %Calculate the number of neighbors at various distances r_0
-  for rind=1:nrr0
-    r_0 = rind*hstep;
-    nrofneig(rind,indinvestigated) = sum(tempdists< 4*r_0^2/(1-r_0^2),2)-1;
-  end;
-  
-  %Loop through zeros to calculate estimates of pair correlation gcorr 
-  % and intensity rhoest for various radii
-  for k = 1:length(indinvestigated)
+  for kx = 1:nrofshifts
+    max_x_loc = (kx)*x_shift;
+    min_x_loc = (kx-1)*x_shift;
+    max_x_close = (kx+1)*x_shift;
+    min_x_close = (kx-2)*x_shift;
+    indinvestigated = find((locminx>=min_x_loc)&(locminx<max_x_loc)&...
+                      (locminy>min_y_loc)&(locminy<=max_y_loc));
+    indcloseext = find((locminx>=min_x_close)&(locminx<max_x_close)&...
+                      (locminy>min_y_close)&(locminy<=max_y_close));
+    total_processed = total_processed + length(indinvestigated);
+    %calculate pseudo-hyperbolic distance between zeros in vicinity
+    tempdists = zeros(length(indinvestigated),length(indcloseext));
+    tempdists = ((locminx(indcloseext)'-locminx(indinvestigated)).^2 + ...
+        (locminy(indcloseext)'-locminy(indinvestigated)).^2)...
+        ./(locminy(indinvestigated)*locminy(indcloseext)');
+    %pseudo-hyperbolic circle of radius r_base around (x_1, y_1) is the same as 
+    % Euclidean circle of radius r_euclid around (x_euclid1,y_euclid1)
+    x_euclid1 = zeros(length(indinvestigated),1);
+    x_euclid1 = locminx(indinvestigated);
+    y_euclid1 = zeros(length(indinvestigated),nrr1);
+    y_euclid1 = locminy(indinvestigated)*((1+r_1.^2)./(1-r_1.^2));
+    r_euclid = zeros(length(indinvestigated),nrr1);
+    r_euclid = 2*locminy(indinvestigated)*(r_1./(1-r_1.^2));
+    %Calculate which indices are within the circle 
+    % of radius r_euclid around (x_euclid1,y_euclid1)
+    yfrom = zeros(length(indinvestigated),nrr1);
+    yto = zeros(length(indinvestigated),nrr1);
+    yfrom = lookup(ygrid',y_euclid1+r_euclid)+1;
+    yto = lookup(ygrid',y_euclid1-r_euclid);
+    xfrom = zeros(length(indinvestigated),filtNos,nrr1);
+    xto = zeros(length(indinvestigated),filtNos,nrr1);
     for rind=1:nrr1
-      for yind = yfrom(k,rind):yto(k,rind)
-        gcorr(xfrom(k,yind,rind):xto(k,yind,rind),yind,1:nrr0,rind) ...
-          = gcorr(xfrom(k,yind,rind):xto(k,yind,rind),yind,1:nrr0,rind) + ...
-          permute(ones(xto(k,yind,rind)-xfrom(k,yind,rind)+1,1) ...
-                *nrofneig(1:nrr0,indinvestigated(k))',[1,3,2]);
-          
-        rhoest(xfrom(k,yind,rind):xto(k,yind,rind),yind,rind) ...
-          = rhoest(xfrom(k,yind,rind):xto(k,yind,rind),yind,rind) + 1;
+      xfrom(:,:,rind) = max(ceil(fs/as*(x_euclid1-...
+            sqrt(max(r_euclid(:,rind).^2-(ygrid'-y_euclid1(:,rind)).^2,0)))),1);
+      xto(:,:,rind) = min(floor(fs/as*(x_euclid1+...
+            sqrt(max(r_euclid(:,rind).^2-(ygrid'-y_euclid1(:,rind)).^2,0)))),N);
+    end;
+  
+    %Calculate the number of neighbors at various distances r_0
+    for rind=1:nrr0
+      r_0 = rind*hstep;
+      nrofneig(rind,indinvestigated) = sum(tempdists< 4*r_0^2/(1-r_0^2),2)-1;
+    end;
+    
+    %Loop through zeros to calculate estimates of pair correlation gcorr 
+    % and intensity rhoest for various radii
+    for k = 1:length(indinvestigated)
+      for rind=1:nrr1
+        for yind = yfrom(k,rind):yto(k,rind)
+          gcorr(xfrom(k,yind,rind):xto(k,yind,rind),yind,1:nrr0,rind) ...
+            = gcorr(xfrom(k,yind,rind):xto(k,yind,rind),yind,1:nrr0,rind) + ...
+            permute(ones(xto(k,yind,rind)-xfrom(k,yind,rind)+1,1) ...
+                  *nrofneig(1:nrr0,indinvestigated(k))',[1,3,2]);
+            
+          rhoest(xfrom(k,yind,rind):xto(k,yind,rind),yind,rind) ...
+            = rhoest(xfrom(k,yind,rind):xto(k,yind,rind),yind,rind) + 1;
+        end;
+        
       end;
       
     end;
     
   end;
-  
-end;
-fprintf( 'Processed %d%% of data \n', 100*total_processed/length(locminx));
+  fprintf( 'Processed %d%% of data \n', 100*total_processed/length(locminx));
 end;
 fprintf( 'Processed 100%% of data, begin filtering \n');
 
@@ -411,7 +412,8 @@ myfinalmask = myfinalmask/(nrr0 - 2*hwin/hstep+1)./posgintsum;
 masksm = min(max(fact_corr*myfinalmask - threshold_corr,0),1);
 
 figure(4);
-imagesc([0,2], [1,0],min(max(masksm(20:20:end,:)',0),1), climits = [0, 1])
+plotfilterbank(min(max(masksm,0),1),as,...
+      'fc',info.fc(2:601)*fs/2,'fs',fs,'clim',[0,1],'audtick','lin');
 
 c_manip = zeros(N,M);
 c_manip(:,2:601) = c_orig(:,2:601).*masksm;
@@ -456,7 +458,8 @@ myfinalmask = myfinalmask/nrr1;
 masksm = min(max(fact_intens*myfinalmask - threshold_intens,0),1);
 
 figure(7);
-imagesc([0,2], [1,0],masksm(20:20:end,:)', climits = [0, 1])
+plotfilterbank(min(max(masksm,0),1),as,...
+      'fc',info.fc(2:601)*fs/2,'fs',fs,'clim',[0,1],'audtick','lin');
 
 c_manip = zeros(N,M);
 c_manip(:,2:601) = c_orig(:,2:601).*masksm;
@@ -542,7 +545,8 @@ end;
 masksm = min(max(myfinalmask/sqrt(2) - threshold_comb,0),1);
 
 figure(10);
-imagesc([0,2], [1,0],min(max(masksm(20:20:end,:)',0),1), climits = [0, 1])
+plotfilterbank(min(max(masksm,0),1),as,...
+      'fc',info.fc(2:601)*fs/2,'fs',fs,'clim',[0,1],'audtick','lin');
 
 c_manip = zeros(N,M);
 c_manip(:,2:601) = c_orig(:,2:601).*masksm;
@@ -569,8 +573,9 @@ plotfilterbank(max(10^(-disp_lowlim/20),abs(c_recons)),as,...
 
 masksm = interestregion;
 
-figure(13);
-imagesc([0,2], [1,0],masksm(20:20:end,:)', climits = [0, 1])
+%figure(13);
+%plotfilterbank(min(max(masksm,0),1),as,...
+%      'fc',info.fc(2:601)*fs/2,'fs',fs,'clim',[0,1],'audtick','lin');
 
 c_manip = zeros(N,M);
 c_manip(:,2:601) = c_orig(:,2:601).*masksm;
@@ -677,4 +682,53 @@ plotfilterbank(max(10^(-disp_lowlim/20),abs(c_recons)),as,...
 %  
 %end;
 
+%Optional saving images
+
+%hf = figure(2);
+%filenameW = [writepath,'noiseppp.pdf'];
+%print (hf, filenameW)
+
+hf = figure(3);
+filenameW = [writepath,filename,'scalfiltered.pdf'];
+print (hf, filenameW)
+
+hf = figure(15);
+filenameW = [writepath,filename,'scalfilterednoisy.pdf'];
+print (hf, filenameW)
+
+hf = figure(4);
+filenameW = [writepath,filename,'maskcorr.pdf'];
+print (hf, filenameW)
+
+hf = figure(5);
+filenameW = [writepath,filename,'maskedscalcorr.pdf'];
+print (hf, filenameW)
+
+hf = figure(6);
+filenameW = [writepath,filename,'scalcorr.pdf'];
+print (hf, filenameW)
+
+hf = figure(7);
+filenameW = [writepath,filename,'maskintens.pdf'];
+print (hf, filenameW)
+
+hf = figure(8);
+filenameW = [writepath,filename,'maskedscalintens.pdf'];
+print (hf, filenameW)
+
+hf = figure(9);
+filenameW = [writepath,filename,'scalintens.pdf'];
+print (hf, filenameW)
+
+hf = figure(10);
+filenameW = [writepath,filename,'maskcomb.pdf'];
+print (hf, filenameW)
+
+hf = figure(11);
+filenameW = [writepath,filename,'maskedscalcomb.pdf'];
+print (hf, filenameW)
+
+hf = figure(12);
+filenameW = [writepath,filename,'scalcomb.pdf'];
+print (hf, filenameW)
 
