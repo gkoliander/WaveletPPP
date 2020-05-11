@@ -28,6 +28,8 @@ threshold_comb = 5.43; #5.53, 5.17
 imnoise = 0;   
 % Flag: no signal desired  
 onlynoise = 0;     
+% Flag: Save plots to ./output/
+saveplots = 0;
 % negative lower limit in log plots
 disp_lowlim = 100;
 % negative upper limit in log plots
@@ -684,51 +686,53 @@ plotfilterbank(max(10^(-disp_lowlim/20),abs(c_recons)),as,...
 
 %Optional saving images
 
-%hf = figure(2);
-%filenameW = [writepath,'noiseppp.pdf'];
-%print (hf, filenameW)
-
-hf = figure(3);
-filenameW = [writepath,filename,'scalfiltered.pdf'];
-print (hf, filenameW)
-
-hf = figure(15);
-filenameW = [writepath,filename,'scalfilterednoisy.pdf'];
-print (hf, filenameW)
-
-hf = figure(4);
-filenameW = [writepath,filename,'maskcorr.pdf'];
-print (hf, filenameW)
-
-hf = figure(5);
-filenameW = [writepath,filename,'maskedscalcorr.pdf'];
-print (hf, filenameW)
-
-hf = figure(6);
-filenameW = [writepath,filename,'scalcorr.pdf'];
-print (hf, filenameW)
-
-hf = figure(7);
-filenameW = [writepath,filename,'maskintens.pdf'];
-print (hf, filenameW)
-
-hf = figure(8);
-filenameW = [writepath,filename,'maskedscalintens.pdf'];
-print (hf, filenameW)
-
-hf = figure(9);
-filenameW = [writepath,filename,'scalintens.pdf'];
-print (hf, filenameW)
-
-hf = figure(10);
-filenameW = [writepath,filename,'maskcomb.pdf'];
-print (hf, filenameW)
-
-hf = figure(11);
-filenameW = [writepath,filename,'maskedscalcomb.pdf'];
-print (hf, filenameW)
-
-hf = figure(12);
-filenameW = [writepath,filename,'scalcomb.pdf'];
-print (hf, filenameW)
-
+if saveplots
+  
+  hf = figure(2);
+  filenameW = [writepath,'noiseppp.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(3);
+  filenameW = [writepath,filename,'scalfiltered.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(15);
+  filenameW = [writepath,filename,'scalfilterednoisy.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(4);
+  filenameW = [writepath,filename,'maskcorr.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(5);
+  filenameW = [writepath,filename,'maskedscalcorr.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(6);
+  filenameW = [writepath,filename,'scalcorr.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(7);
+  filenameW = [writepath,filename,'maskintens.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(8);
+  filenameW = [writepath,filename,'maskedscalintens.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(9);
+  filenameW = [writepath,filename,'scalintens.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(10);
+  filenameW = [writepath,filename,'maskcomb.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(11);
+  filenameW = [writepath,filename,'maskedscalcomb.pdf'];
+  print (hf, filenameW)
+  
+  hf = figure(12);
+  filenameW = [writepath,filename,'scalcomb.pdf'];
+  print (hf, filenameW)
+end;
